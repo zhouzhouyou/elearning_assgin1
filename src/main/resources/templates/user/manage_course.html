@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.css}">
+    <script th:src="@{/js/jquery-3.4.1.slim.js}"></script>
+    <script th:src="@{/js/popper.js}"></script>
+    <script th:src="@{/js/js_bootstrap.js}"></script>
+</head>
+<body>
+<div th:replace="~{user/header :: topBar}"></div>
+<div>
+    <button class="btn btn-primary" onclick="insert_course()">Insert</button>
+</div>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Name</th>
+        <th scope="col">Price</th>
+        <th scope="col">Modify</th>
+        <th scope="col">Delete</th>
+    </tr>
+    </thead>
+    <tbody th:each="i:${list}">
+    <tr>
+        <th scope="row" th:text="${i.getId()}"></th>
+        <td th:text="${i.getName()}"></td>
+        <td th:text="${i.getPrice()}"></td>
+        <td>
+            <button type="button" class="btn btn-primary" th:onclick="update_course([[${i.getId()}]], [[${i.getName()}]], [[${i.getPrice()}]]);">Modify</button>
+        </td>
+        <td>
+            <button type="button" class="btn btn-warning" th:onclick="delete_course([[${i.getId()}]], [[${i.getName()}]], [[${i.getPrice()}]])">Delete</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div class="modal fade" id="updateModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="updateLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form type="post" th:action="@{/save_course}">
+                    <div class="form-group">
+                        <label for="id_label">Id</label>
+                        <input type="text" name="id" id="id_label" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" class="form-control" id="price" name="price">
+                    </div>
+                    <button type="submit" class="btn btn-primary">UPDATE</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="insertModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="insertLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="insertLabel">Insert</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form type="post" th:action="@{/save_course}">
+                    <div class="form-group">
+                        <label for="id_label">Id</label>
+                        <input type="text" name="id" class="form-control" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input type="number" class="form-control" name="price">
+                    </div>
+                    <button type="submit" class="btn btn-primary">INSERT</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="delete_course" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="deleteLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteLabel">Delete Course</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are You Sure To Delete This Course?</p>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Price</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <td id="to_delete_id"></td>
+                        <td id="to_delete_name"></td>
+                        <td id="to_delete_price"></td>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <form type="post" th:action="delete_course">
+                    <input type="text" id="delete_id" name="id" class="form-control">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    let modal, title, id_label, name_label, price_label;
+
+
+    $(function () {
+        modal = $(`#updateModal`);
+        title = $(`#updateLabel`);
+        id_label = $(`#id_label`);
+        name_label = $(`#name`);
+        price_label = $(`#price`);
+    });
+
+    function update_course(id, name, price) {
+        title.text(id);
+        id_label.val(id);
+        name_label.val(name);
+        price_label.val(price);
+        modal.modal('show');
+    }
+
+    function insert_course() {
+        $(`#insertModal`).modal('show');
+    }
+
+    function delete_course(id, name, price) {
+        $(`#delete_course`).modal('show');
+        $(`#to_delete_id`).text(id);
+        $(`#to_delete_name`).text(name);
+        $(`#to_delete_price`).text(price);
+        $(`#delete_id`).val(id);
+    }
+
+
+</script>
+</html>

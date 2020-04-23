@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.css}">
+    <script th:src="@{/js/jquery-3.4.1.slim.js}"></script>
+    <script th:src="@{/js/popper.js}"></script>
+    <script th:src="@{/js/js_bootstrap.js}"></script>
+</head>
+<body>
+    <div th:replace="~{user/header :: topBar}"></div>
+    <p th:text="'hello, ' + ${name} + '!'"/>
+</body>
+</html>

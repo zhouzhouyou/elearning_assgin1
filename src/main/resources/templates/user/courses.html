@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header"  th:content="${_csrf.headerName}"/>
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.css}">
+    <script th:src="@{/js/jquery-3.4.1.slim.js}"></script>
+    <script th:src="@{/js/popper.js}"></script>
+    <script th:src="@{/js/js_bootstrap.js}"></script>
+</head>
+<body>
+<div th:replace="~{user/header :: topBar}"></div>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Name</th>
+        <th scope="col">Price</th>
+        <th scope="col">Buy</th>
+    </tr>
+    </thead>
+    <tbody th:each="i:${list}">
+    <tr>
+        <th scope="row" th:text="${i.getId()}"></th>
+        <td th:text="${i.getName()}"></td>
+        <td th:text="${i.getPrice()}"></td>
+        <td>
+            <button type="button" class="btn btn-primary" th:unless="${i.isBought()}" th:onclick="buy_course([[${user.getId()}]], [[${i.getId()}]]);">BUY</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+<script>
+    function buy_course(userId, courseId) {
+        let header = $("meta[name='_csrf_header']").attr("content");
+        let token = $("meta[name='_csrf']").attr("content");
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/buy",
+            data: JSON.stringify({
+                user : userId,
+                course : courseId
+            }),
+            beforeSend : function(xhr) {
+                xhr.setRequestHeader(header, token);
+            },
+            cache: false,
+            success: function (data) {
+                alert(data);
+                window.location.reload();
+            },
+            error: function (e) {
+                alert("fail")
+                alert(e);
+            }
+        });
+        // $.post("/buy_course",{user:userId ,course:courseId}, function (result) {
+        //     alert(result);
+        // })
+    }
+</script>
+</html>
